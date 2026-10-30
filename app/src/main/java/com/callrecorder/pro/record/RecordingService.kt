@@ -73,6 +73,7 @@ class RecordingService : Service() {
             // --- rules engine (manual tile start bypasses rules) ---
             val incomingNumber = startIntent.getStringExtra(EXTRA_NUMBER)
             val incomingNumber = startIntent.getStringExtra(EXTRA_NUMBER)
+            val incomingNumber = startIntent.getStringExtra(EXTRA_NUMBER)
             val resolvedNumber = incomingNumber ?: ""
             val ignored = s.ignoredNumbers.any {
                 it.isNotBlank() && resolvedNumber.endsWith(it.takeLast(9))
