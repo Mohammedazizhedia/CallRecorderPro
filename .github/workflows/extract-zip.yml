@@ -1,0 +1,43 @@
+name: Extract ZIP
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract newest CallRecorderPro ZIP
+        run: |
+          set -e
+          ZIP=$(ls -t CallRecorderPro*.zip 2>/dev/null | head -n 1)
+          if [ -z "$ZIP" ]; then
+            echo "::error::No ZIP found! Files in repo:"
+            ls -la
+            exit 1
+          fi
+          echo "Extracting: $ZIP"
+          unzip -o "$ZIP" -d /tmp/x
+          mv /tmp/x/CallRecorderPro/* .
+          mv /tmp/x/CallRecorderPro/.[!.]* . 2>/dev/null || true
+          rm -rf /tmp/x "$ZIP"
+          echo "EXTRACTED_ZIP=$ZIP" >> "$GITHUB_ENV"
+
+      - name: Commit
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add -A
+          git commit -m "Import from $EXTRACTED_ZIP" || echo "Nothing to commit"
+          git push
+
+      - name: Trigger build
+        run: |
+          gh workflow run build.yml --ref main
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
