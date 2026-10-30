@@ -105,12 +105,13 @@ fun PlayerScreen(vm: PlayerViewModel, onBack: () -> Unit) {
     LaunchedEffect(position, loopA, loopB, loopEnabled) {
         val a = loopA; val b = loopB
         if (loopEnabled && a != null && b != null && b > a && position >= b) {
-            player.seekTo(a)
+            player?.seekTo(a)
         }
     }
 
-    if (player != null && !playError) {
-        vm.startTicker({ player.isPlaying }, { player.currentPosition })
+    val activePlayer = player
+    if (activePlayer != null && !playError) {
+        vm.startTicker({ activePlayer.isPlaying }, { activePlayer.currentPosition })
     }
 
     if (playError || player == null) {
