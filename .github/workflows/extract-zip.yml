@@ -12,32 +12,35 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Extract newest CallRecorderPro ZIP
+      - name: Find and extract newest CallRecorderPro ZIP
         run: |
           set -e
-          ZIP=$(ls -t CallRecorderPro*.zip 2>/dev/null | head -n 1)
+          ZIP=$(ls -t CallRecorderPro*.zip 2>/dev/null | head -n 1 || true)
           if [ -z "$ZIP" ]; then
-            echo "::error::No ZIP found! Files in repo:"
+            echo "::error::No ZIP found! Upload one first (name must start with CallRecorderPro)."
             ls -la
             exit 1
           fi
-          echo "Extracting: $ZIP"
+          echo "Found ZIP: $ZIP"
           unzip -o "$ZIP" -d /tmp/x
-          mv /tmp/x/CallRecorderPro/* .
-          mv /tmp/x/CallRecorderPro/.[!.]* . 2>/dev/null || true
+          if [ -d /tmp/x/CallRecorderPro ]; then
+            cp -r /tmp/x/CallRecorderPro/. .
+          else
+            cp -r /tmp/x/. .
+          fi
           rm -rf /tmp/x "$ZIP"
-          echo "EXTRACTED_ZIP=$ZIP" >> "$GITHUB_ENV"
+          echo "EXTRACTED=$ZIP" >> "$GITHUB_ENV"
 
-      - name: Commit
+      - name: Commit and push
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add -A
-          git commit -m "Import from $EXTRACTED_ZIP" || echo "Nothing to commit"
+          git commit -m "Import from $EXTRACTED" || echo "Nothing to commit"
           git push
 
-      - name: Trigger build
+      - name: Trigger build (manual fallback if this fails)
         run: |
-          gh workflow run build.yml --ref main
+          gh workflow run build.yml --ref main || echo "::warning::Build not auto-triggered — run 'Build release APK' manually from Actions tab"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
