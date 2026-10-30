@@ -40,7 +40,7 @@ private data class PermStep(
     val required: Boolean
 )
 
-private fun steps(): List<PermStep> = buildList {
+private fun buildSteps(): List<PermStep> = buildList {
     add(PermStep(R.string.onboarding_legal_title, R.string.onboarding_legal_body, null, true))
     add(PermStep(R.string.onboarding_perm_audio_title, R.string.onboarding_perm_audio_body, Manifest.permission.RECORD_AUDIO, true))
     add(PermStep(R.string.onboarding_perm_phone_title, R.string.onboarding_perm_phone_body, Manifest.permission.READ_PHONE_STATE, false))
@@ -51,52 +51,33 @@ private fun steps(): List<PermStep> = buildList {
     add(PermStep(R.string.onboarding_perm_calllog_title, R.string.onboarding_perm_calllog_body, Manifest.permission.READ_CALL_LOG, false))
 }
 
-/** Step-by-step permission onboarding with graceful denial handling. */
 @Composable
 fun OnboardingScreen(
     settings: SettingsRepository,
     onFinished: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    val allSteps = remember { steps() }
+    val allSteps = remember { buildSteps() }
     var step by remember { mutableStateOf(0) }
     var showDenied by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val current = allSteps[step.coerceIn(allSteps.indices)]
+    val isLast = step == allSteps.size - 1
 
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
-        if (!granted && current.required) {
-            showDenied = true
-        } else {
-            showDenied = false
-            advance()
-        }
-    }
-
-    fun grantOrAdvance() {
         when {
-            step == 0 -> {
-                scope.launch { settings.setLegalAccepted(true) }
-                advance()
+            !granted && current.required -> showDenied = true
+            isLast -> scope.launch {
+                settings.setOnboardingDone(true)
+                onFinished()
             }
-            current.permission == null -> advance()
-            ContextCompat.checkSelfPermission(context, current.permission) ==
-                    PackageManager.PERMISSION_GRANTED -> advance()
-            else -> launcher.launch(current.permission)
+            else -> {
+                showDenied = false
+                step++
+            }
         }
-    }
-
-    fun finish() {
-        scope.launch {
-            settings.setOnboardingDone(true)
-            onFinished()
-        }
-    }
-
-    fun advance() {
-        if (step >= allSteps.size - 1) finish() else step++
     }
 
     Column(
@@ -127,17 +108,49 @@ fun OnboardingScreen(
         Spacer(Modifier.height(24.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             if (step > 0) {
-                TextButton(onClick = { advance() }) {
+                TextButton(onClick = {
+                    if (isLast) {
+                        scope.launch {
+                            settings.setOnboardingDone(true)
+                            onFinished()
+                        }
+                    } else step++
+                }) {
                     Text(stringResource(R.string.onboarding_skip))
                 }
             }
             Spacer(Modifier.weight(1f))
-            Button(onClick = { grantOrAdvance() }) {
+            Button(onClick = {
+                when {
+                    step == 0 -> {
+                        scope.launch { settings.setLegalAccepted(true) }
+                        step++
+                    }
+                    current.permission == null -> {
+                        if (isLast) {
+                            scope.launch {
+                                settings.setOnboardingDone(true)
+                                onFinished()
+                            }
+                        } else step++
+                    }
+                    ContextCompat.checkSelfPermission(context, current.permission) ==
+                            PackageManager.PERMISSION_GRANTED -> {
+                        if (isLast) {
+                            scope.launch {
+                                settings.setOnboardingDone(true)
+                                onFinished()
+                            }
+                        } else step++
+                    }
+                    else -> launcher.launch(current.permission)
+                }
+            }) {
                 Text(
                     stringResource(
                         when {
                             step == 0 -> R.string.onboarding_i_agree
-                            step == allSteps.size - 1 -> R.string.onboarding_start
+                            isLast -> R.string.onboarding_start
                             else -> R.string.onboarding_next
                         }
                     )

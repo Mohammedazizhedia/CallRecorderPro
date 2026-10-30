@@ -56,21 +56,22 @@ class RecordingService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_STOP -> { stopRecording(); stopSelf() }
-            else -> intent?.let { startRecordingInternal(it.getStringExtra(EXTRA_NUMBER)) }
+            else -> intent?.let { startRecordingInternal(it) }
         }
         return START_STICKY
     }
 
-    private fun startRecordingInternal(incomingNumber: String?) {
+    private fun startRecordingInternal(startIntent: Intent) {
         if (recording) return
         val app = application as CallRecorderApp
         val settings = app.container.settings
 
         scope.launch {
             val s = settings.settings.first()
-            val manual = intent?.getBooleanExtra(EXTRA_MANUAL, false) == true
+            val manual = startIntent.getBooleanExtra(EXTRA_MANUAL, false)
 
             // --- rules engine (manual tile start bypasses rules) ---
+            val incomingNumber = startIntent.getStringExtra(EXTRA_NUMBER)
             val resolvedNumber = incomingNumber ?: ""
             val ignored = s.ignoredNumbers.any {
                 it.isNotBlank() && resolvedNumber.endsWith(it.takeLast(9))
