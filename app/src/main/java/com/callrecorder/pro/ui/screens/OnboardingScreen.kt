@@ -1,3 +1,4 @@
+
 package com.callrecorder.pro.ui.screens
 
 import android.Manifest
@@ -51,6 +52,11 @@ private fun buildSteps(): List<PermStep> = buildList {
     add(PermStep(R.string.onboarding_perm_calllog_title, R.string.onboarding_perm_calllog_body, Manifest.permission.READ_CALL_LOG, false))
 }
 
+/**
+ * Step-by-step permission onboarding with graceful denial handling.
+ * NOTE: no local functions on purpose - the compiler failed to resolve
+ * mutually-referencing local funs here; all logic is inlined.
+ */
 @Composable
 fun OnboardingScreen(
     settings: SettingsRepository,
