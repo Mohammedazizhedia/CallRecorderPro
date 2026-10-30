@@ -16,8 +16,10 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Generate Gradle wrapper
-        run: gradle wrapper --gradle-version 8.9
+      # ده بيثبت Gradle 8.9 على الـ runner — بديل الـ wrapper
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
 
       - name: Decode release keystore (optional)
         env:
@@ -39,7 +41,7 @@ jobs:
           fi
 
       - name: Build release APK
-        run: ./gradlew assembleRelease --stacktrace
+        run: gradle assembleRelease --stacktrace
 
       - uses: actions/upload-artifact@v4
         with:
