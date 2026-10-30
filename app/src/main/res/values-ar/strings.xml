@@ -127,4 +127,17 @@
     <string name="settings_ignored_save">حفظ قائمة الاستثناء</string>
     <string name="player_loop_ab">تكرار</string>
     <string name="tile_record">تسجيل</string>
+    <string name="sourcetest_saved">تم الحفظ ✓</string>
+    <string name="settings_font">الخط</string>
+    <string name="settings_font_family">نوع الخط</string>
+    <string name="font_cairo">القاهرة (Cairo)</string>
+    <string name="font_ibm">IBM بليكس عربي</string>
+    <string name="font_basseet">بسيط (Basseet)</string>
+    <string name="font_camel">الجمل (Camel)</string>
+    <string name="font_system">خط النظام</string>
+    <string name="settings_font_size">حجم الخط</string>
+    <string name="size_small">صغير</string>
+    <string name="size_normal">عادي</string>
+    <string name="size_large">كبير</string>
+    <string name="size_huge">ضخم</string>
 </resources>

@@ -80,6 +80,7 @@ fun SourceTestScreen(container: AppContainer) {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(results, key = { it.sourceKey }) { r ->
                     val isBest = best?.sourceKey == r.sourceKey
+                    var saved by remember(r.sourceKey) { mutableStateOf(false) }
                     Card(Modifier.fillMaxWidth()) {
                         Column(Modifier.padding(12.dp)) {
                             Text(
@@ -95,8 +96,16 @@ fun SourceTestScreen(container: AppContainer) {
                                     String.format(Locale.US, "%.1f dB", r.noiseFloorDb))
                             Spacer(Modifier.height(8.dp))
                             OutlinedButton(onClick = {
-                                scope.launch { container.settings.setAudioSource(r.sourceKey) }
-                            }) { Text(stringResource(R.string.sourcetest_use)) }
+                                scope.launch {
+                                    container.settings.setAudioSource(r.sourceKey)
+                                    saved = true
+                                }
+                            }) {
+                                Text(
+                                    if (saved) stringResource(R.string.sourcetest_saved)
+                                    else stringResource(R.string.sourcetest_use)
+                                )
+                            }
                         }
                     }
                 }

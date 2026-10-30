@@ -3,6 +3,7 @@ package com.callrecorder.pro.data.settings
 import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -38,6 +39,8 @@ class SettingsRepository(private val context: Context) {
         val samsungTreeUri = stringPreferencesKey("samsung_tree_uri")
         val trimSilence = booleanPreferencesKey("trim_silence")
         val normalize = booleanPreferencesKey("normalize")
+        val fontFamily = stringPreferencesKey("font_family")
+        val fontScale = floatPreferencesKey("font_scale")
     }
 
     data class Settings(
@@ -60,7 +63,9 @@ class SettingsRepository(private val context: Context) {
         val appLock: Boolean = false,
         val samsungTreeUri: String = "",
         val trimSilence: Boolean = false,
-        val normalize: Boolean = true
+        val normalize: Boolean = true,
+        val fontFamily: String = "cairo",
+        val fontScale: Float = 1f
     )
 
     val settings: Flow<Settings> = context.dataStore.data.map { p ->
@@ -88,7 +93,9 @@ class SettingsRepository(private val context: Context) {
             appLock = p[K.appLock] ?: false,
             samsungTreeUri = p[K.samsungTreeUri] ?: "",
             trimSilence = p[K.trimSilence] ?: false,
-            normalize = p[K.normalize] ?: true
+            normalize = p[K.normalize] ?: true,
+            fontFamily = p[K.fontFamily] ?: "cairo",
+            fontScale = p[K.fontScale] ?: 1f
         )
     }
 
@@ -114,4 +121,6 @@ class SettingsRepository(private val context: Context) {
     suspend fun setSamsungTreeUri(v: String) = context.dataStore.edit { it[K.samsungTreeUri] = v }
     suspend fun setTrimSilence(v: Boolean) = context.dataStore.edit { it[K.trimSilence] = v }
     suspend fun setNormalize(v: Boolean) = context.dataStore.edit { it[K.normalize] = v }
+    suspend fun setFontFamily(v: String) = context.dataStore.edit { it[K.fontFamily] = v }
+    suspend fun setFontScale(v: Float) = context.dataStore.edit { it[K.fontScale] = v }
 }

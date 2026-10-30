@@ -219,6 +219,38 @@ fun SettingsScreen(container: AppContainer, onOpenSourceTest: () -> Unit) {
                 }
             }) { Text(stringResource(R.string.settings_battery_desc)) }
 
+            SectionTitle(stringResource(R.string.settings_font))
+            Text(stringResource(R.string.settings_font_family), style = MaterialTheme.typography.titleMedium)
+            listOf(
+                "cairo" to R.string.font_cairo,
+                "ibm" to R.string.font_ibm,
+                "basseet" to R.string.font_basseet,
+                "camel" to R.string.font_camel,
+                "system" to R.string.font_system
+            ).forEach { (key, label) ->
+                Row {
+                    RadioButton(
+                        selected = settings.fontFamily == key,
+                        onClick = { upd { container.settings.setFontFamily(key) } })
+                    Text(stringResource(label))
+                }
+            }
+            Text(stringResource(R.string.settings_font_size), style = MaterialTheme.typography.titleMedium)
+            Row {
+                listOf(
+                    0.9f to R.string.size_small,
+                    1f to R.string.size_normal,
+                    1.15f to R.string.size_large,
+                    1.3f to R.string.size_huge
+                ).forEach { (v, label) ->
+                    FilterChip(
+                        selected = settings.fontScale == v,
+                        onClick = { upd { container.settings.setFontScale(v) } },
+                        label = { Text(stringResource(label)) })
+                    Spacer(Modifier.width(8.dp))
+                }
+            }
+
             SectionTitle(stringResource(R.string.settings_language))
             listOf(
                 "" to R.string.language_system,

@@ -57,7 +57,7 @@ private fun AppRoot(container: AppContainer) {
         }
     }
 
-    CallRecorderTheme {
+    CallRecorderTheme(fontKey = s.fontFamily, fontScale = s.fontScale) {
         if (!s.onboardingDone || !s.legalAccepted) {
             OnboardingScreen(container.settings) {}
             return@CallRecorderTheme

@@ -134,4 +134,17 @@
     <string name="settings_ignored_save">Save ignore list</string>
     <string name="player_loop_ab">Loop</string>
     <string name="tile_record">Record</string>
+    <string name="sourcetest_saved">Saved ✓</string>
+    <string name="settings_font">Font</string>
+    <string name="settings_font_family">Font family</string>
+    <string name="font_cairo">Cairo</string>
+    <string name="font_ibm">IBM Plex Arabic</string>
+    <string name="font_basseet">Basseet</string>
+    <string name="font_camel">Year of the Camel</string>
+    <string name="font_system">System default</string>
+    <string name="settings_font_size">Font size</string>
+    <string name="size_small">Small</string>
+    <string name="size_normal">Normal</string>
+    <string name="size_large">Large</string>
+    <string name="size_huge">Huge</string>
 </resources>

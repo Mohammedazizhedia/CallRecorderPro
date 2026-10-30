@@ -1,3 +1,4 @@
+
 package com.callrecorder.pro.ui.theme
 
 import android.os.Build
@@ -8,22 +9,28 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 
 private val LightColors = lightColorScheme(
-    primary = androidx.compose.ui.graphics.Color(0xFF0B57D0),
-    secondary = androidx.compose.ui.graphics.Color(0xFF006A6A),
-    tertiary = androidx.compose.ui.graphics.Color(0xFF984061)
+    primary = Color(0xFF0B57D0),
+    secondary = Color(0xFF006A6A),
+    tertiary = Color(0xFF984061)
 )
 
 private val DarkColors = darkColorScheme(
-    primary = androidx.compose.ui.graphics.Color(0xFFA8C7FA),
-    secondary = androidx.compose.ui.graphics.Color(0xFF4CDADB),
-    tertiary = androidx.compose.ui.graphics.Color(0xFFFFB0C9)
+    primary = Color(0xFFA8C7FA),
+    secondary = Color(0xFF4CDADB),
+    tertiary = Color(0xFFFFB0C9)
 )
 
 @Composable
 fun CallRecorderTheme(
+    fontKey: String = "cairo",
+    fontScale: Float = 1f,
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
@@ -36,9 +43,15 @@ fun CallRecorderTheme(
         darkTheme -> DarkColors
         else -> LightColors
     }
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = CairoTypography,
-        content = content
-    )
+    // fontScale scales every sp text in the app without touching dp layout
+    val density = LocalDensity.current
+    CompositionLocalProvider(
+        LocalDensity provides Density(density.density, density.fontScale * fontScale)
+    ) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = appTypography(fontFamilyFor(fontKey)),
+            content = content
+        )
+    }
 }
