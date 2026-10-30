@@ -10,12 +10,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Extract ZIP
+
+      - name: Find and extract ZIP
         run: |
-          if [ ! -f CallRecorderPro.zip ]; then echo "No zip found"; exit 0; fi
-          unzip CallRecorderPro.zip -d /tmp/crp
-          mv /tmp/crp/CallRecorderPro/* .
-          rm -rf /tmp/crp CallRecorderPro.zip
+          set -e
+          # يختار أحدث ملف zip اسمه بيبدأ بـ CallRecorderPro (مش مهم الرقم)
+          ZIP=$(ls -t CallRecorderPro*.zip 2>/dev/null | head -n 1)
+          if [ -z "$ZIP" ]; then
+            echo "::error::No CallRecorderPro*.zip found!"
+            ls -la
+            exit 1
+          fi
+          echo "Extracting: $ZIP"
+          unzip -o "$ZIP" -d /tmp/crp
+          if [ -d /tmp/crp/CallRecorderPro ]; then
+            mv /tmp/crp/CallRecorderPro/* .
+            mv /tmp/crp/CallRecorderPro/.[!.]* . 2>/dev/null || true
+          else
+            mv /tmp/crp/* .
+          fi
+          rm -rf /tmp/crp "$ZIP"
+
       - name: Commit extracted files
         run: |
           git config user.name "github-actions"
