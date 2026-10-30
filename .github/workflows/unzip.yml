@@ -1,0 +1,25 @@
+name: Extract uploaded ZIP
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  unzip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract ZIP
+        run: |
+          if [ ! -f CallRecorderPro.zip ]; then echo "No zip found"; exit 0; fi
+          unzip CallRecorderPro.zip -d /tmp/crp
+          mv /tmp/crp/CallRecorderPro/* .
+          rm -rf /tmp/crp CallRecorderPro.zip
+      - name: Commit extracted files
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add -A
+          git commit -m "Extract project files from ZIP" || echo "Nothing to commit"
+          git push
