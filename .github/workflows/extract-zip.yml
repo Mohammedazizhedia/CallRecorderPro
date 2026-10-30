@@ -5,7 +5,6 @@ on:
 permissions:
   contents: write
   actions: write
-  workflows: write
 
 jobs:
   extract:
@@ -13,24 +12,28 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Find and extract newest CallRecorderPro ZIP
+      - name: Find newest ZIP
         run: |
           set -e
           ZIP=$(ls -t CallRecorderPro*.zip 2>/dev/null | head -n 1 || true)
           if [ -z "$ZIP" ]; then
-            echo "::error::No ZIP found! Upload one first (name must start with CallRecorderPro)."
-            ls -la
+            echo "::error::No ZIP found! Upload one first (Code -> Add file -> Upload files)."
             exit 1
           fi
           echo "Found ZIP: $ZIP"
           unzip -o "$ZIP" -d /tmp/x
-          if [ -d /tmp/x/CallRecorderPro ]; then
-            cp -r /tmp/x/CallRecorderPro/. .
-          else
-            cp -r /tmp/x/. .
-          fi
-          rm -rf /tmp/x "$ZIP"
           echo "EXTRACTED=$ZIP" >> "$GITHUB_ENV"
+
+      - name: Copy files (excluding .github workflows)
+        run: |
+          set -e
+          if [ -d /tmp/x/CallRecorderPro ]; then
+            SRC=/tmp/x/CallRecorderPro
+          else
+            SRC=/tmp/x
+          fi
+          rsync -a --exclude='.github' "$SRC"/ ./
+          rm -rf /tmp/x "$EXTRACTED_ZIP" 2>/dev/null || true
 
       - name: Commit and push
         run: |
@@ -40,8 +43,8 @@ jobs:
           git commit -m "Import from $EXTRACTED" || echo "Nothing to commit"
           git push
 
-      - name: Trigger build (manual fallback if this fails)
+      - name: Trigger build
         run: |
-          gh workflow run build.yml --ref main || echo "::warning::Build not auto-triggered — run 'Build release APK' manually from Actions tab"
+          gh workflow run build.yml --ref main || echo "::warning::Run 'Build release APK' manually from Actions tab"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
