@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -26,6 +27,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -149,7 +151,7 @@ fun PlayerScreen(vm: PlayerViewModel, onBack: () -> Unit) {
                     listOf(0.5f, 1.0f, 1.5f, 2.0f).forEach { v ->
                         DropdownMenuItem(
                             text = { Text("${v}x") },
-                            onClick = { p.setPlaybackSpeed(v); expanded = false }
+                            onClick = { p?.setPlaybackSpeed(v); expanded = false }
                         )
                     }
                 }
@@ -166,17 +168,17 @@ fun PlayerScreen(vm: PlayerViewModel, onBack: () -> Unit) {
             WaveformView(
                 peaks = peaks,
                 progress = if (recVal.durationMs > 0) position.toFloat() / recVal.durationMs else 0f,
-                onSeek = { p -> p.seekTo((p * recVal.durationMs).toLong()) }
+                onSeek = { frac -> p?.seekTo((frac * recVal.durationMs).toLong()) }
             )
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                IconButton(onClick = { p.seekBack() }) { Icon(Icons.Filled.Replay, null) }
-                IconButton(onClick = { if (p.isPlaying) p.pause() else p.play() }) {
+                IconButton(onClick = { p?.seekBack() }) { Icon(Icons.Filled.Replay, null) }
+                IconButton(onClick = { if (p?.isPlaying) p?.pause() else p?.play() }) {
                     Icon(
-                        if (p.isPlaying) Icons.Filled.Close else Icons.Filled.PlayArrow,
+                        if (p?.isPlaying) Icons.Filled.Close else Icons.Filled.PlayArrow,
                         null
                     )
                 }
-                IconButton(onClick = { p.seekForward() }) { Icon(Icons.Filled.Forward, null) }
+                IconButton(onClick = { p?.seekForward() }) { Icon(Icons.Filled.Forward, null) }
                 IconButton(onClick = { showMarkerDialog = true }) { Icon(Icons.Filled.Add, null) }
             }
             Row(
@@ -185,12 +187,12 @@ fun PlayerScreen(vm: PlayerViewModel, onBack: () -> Unit) {
             ) {
                 FilterChip(
                     selected = loopA != null,
-                    onClick = { loopA = p.currentPosition; if (loopB != null && loopB!! <= loopA!!) loopB = null },
+                    onClick = { loopA = p?.currentPosition; if (loopB != null && loopB!! <= loopA!!) loopB = null },
                     label = { Text("A " + (loopA?.let(::formatDuration) ?: "--:--")) }
                 )
                 FilterChip(
                     selected = loopB != null,
-                    onClick = { loopB = p.currentPosition; loopEnabled = loopA != null && loopB!! > loopA!! },
+                    onClick = { loopB = p?.currentPosition; loopEnabled = loopA != null && loopB!! > loopA!! },
                     label = { Text("B " + (loopB?.let(::formatDuration) ?: "--:--")) }
                 )
                 FilterChip(
@@ -231,7 +233,7 @@ fun PlayerScreen(vm: PlayerViewModel, onBack: () -> Unit) {
                             text = formatDuration(m.positionMs) + " — " + m.note,
                             modifier = Modifier.weight(1f)
                         )
-                        IconButton(onClick = { p.seekTo(m.positionMs) }) {
+                        IconButton(onClick = { p?.seekTo(m.positionMs) }) {
                             Icon(Icons.Filled.PlayArrow, null)
                         }
                         IconButton(onClick = { vm.removeMarker(m.positionMs) }) {
