@@ -11,30 +11,34 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Find and extract ZIP
+      - name: Keep newest ZIP only, extract it, delete the rest
         run: |
           set -e
-          # يختار أحدث ملف zip اسمه بيبدأ بـ CallRecorderPro (مش مهم الرقم)
-          ZIP=$(ls -t CallRecorderPro*.zip 2>/dev/null | head -n 1)
-          if [ -z "$ZIP" ]; then
-            echo "::error::No CallRecorderPro*.zip found!"
+          ZIPS=$(ls -t CallRecorderPro*.zip 2>/dev/null || true)
+          if [ -z "$ZIPS" ]; then
+            echo "::error::No CallRecorderPro*.zip found in repo root!"
             ls -la
             exit 1
           fi
-          echo "Extracting: $ZIP"
-          unzip -o "$ZIP" -d /tmp/crp
+          NEWEST=$(echo "$ZIPS" | head -n 1)
+          echo "Newest: $NEWEST"
+          echo "$ZIPS" | tail -n +2 | while read -r old; do
+            echo "Deleting old: $old"
+            rm -f "$old"
+          done
+          unzip -o "$NEWEST" -d /tmp/crp
           if [ -d /tmp/crp/CallRecorderPro ]; then
             mv /tmp/crp/CallRecorderPro/* .
             mv /tmp/crp/CallRecorderPro/.[!.]* . 2>/dev/null || true
           else
             mv /tmp/crp/* .
           fi
-          rm -rf /tmp/crp "$ZIP"
+          rm -rf /tmp/crp "$NEWEST"
 
       - name: Commit extracted files
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add -A
-          git commit -m "Extract project files from ZIP" || echo "Nothing to commit"
+          git commit -m "Extract newest ZIP, remove older ones" || echo "Nothing to commit"
           git push
