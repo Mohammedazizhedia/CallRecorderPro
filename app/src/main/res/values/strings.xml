@@ -147,4 +147,10 @@
     <string name="size_normal">Normal</string>
     <string name="size_large">Large</string>
     <string name="size_huge">Huge</string>
+    <string name="settings_accessibility">Call detection (Accessibility)</string>
+    <string name="settings_accessibility_desc">Required on Android 14+ to start recording automatically when a call screen appears. Enable "Call Recorder Pro" in the next screen, then turn on speakerphone during calls.</string>
+    <string name="settings_accessibility_open">Open Accessibility settings</string>
+    <string name="font_bold">Bold text</string>
+    <string name="player_file_missing">Recording file is missing</string>
+    <string name="player_error">Could not play this recording (file may be corrupt)</string>
 </resources>

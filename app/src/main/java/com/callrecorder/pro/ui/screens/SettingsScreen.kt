@@ -151,6 +151,14 @@ fun SettingsScreen(container: AppContainer, onOpenSourceTest: () -> Unit) {
                 }
             }
 
+            SectionTitle(stringResource(R.string.settings_accessibility))
+            Text(stringResource(R.string.settings_accessibility_desc))
+            OutlinedButton(onClick = {
+                runCatching {
+                    context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                }
+            }) { Text(stringResource(R.string.settings_accessibility_open)) }
+
             SectionTitle(stringResource(R.string.settings_storage))
             Text(stringResource(R.string.storage_usage, formatBytes(storageBytes)))
             Text(stringResource(R.string.settings_auto_delete), style = MaterialTheme.typography.titleMedium)
@@ -234,6 +242,9 @@ fun SettingsScreen(container: AppContainer, onOpenSourceTest: () -> Unit) {
                         onClick = { upd { container.settings.setFontFamily(key) } })
                     Text(stringResource(label))
                 }
+            }
+            ToggleRow(R.string.font_bold, settings.fontBold) { v ->
+                upd { container.settings.setFontBold(v) }
             }
             Text(stringResource(R.string.settings_font_size), style = MaterialTheme.typography.titleMedium)
             Row {

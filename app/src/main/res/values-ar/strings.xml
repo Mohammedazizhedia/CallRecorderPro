@@ -140,4 +140,10 @@
     <string name="size_normal">عادي</string>
     <string name="size_large">كبير</string>
     <string name="size_huge">ضخم</string>
+    <string name="settings_accessibility">اكتشاف المكالمات (إمكانية الوصول)</string>
+    <string name="settings_accessibility_desc">مطلوب على أندرويد 14+ لتشغيل التسجيل تلقائياً عند ظهور شاشة المكالمة. فعّل "Call Recorder Pro" في الشاشة التالية، وشغّل السماعة أثناء المكالمات.</string>
+    <string name="settings_accessibility_open">فتح إعدادات إمكانية الوصول</string>
+    <string name="font_bold">خط عريض (Bold)</string>
+    <string name="player_file_missing">ملف التسجيل غير موجود</string>
+    <string name="player_error">تعذر تشغيل هذا التسجيل (الملف قد يكون تالفاً)</string>
 </resources>

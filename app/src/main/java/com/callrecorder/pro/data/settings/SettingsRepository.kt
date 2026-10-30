@@ -40,6 +40,7 @@ class SettingsRepository(private val context: Context) {
         val trimSilence = booleanPreferencesKey("trim_silence")
         val normalize = booleanPreferencesKey("normalize")
         val fontFamily = stringPreferencesKey("font_family")
+        val fontBold = booleanPreferencesKey("font_bold")
         val fontScale = floatPreferencesKey("font_scale")
     }
 
@@ -65,7 +66,8 @@ class SettingsRepository(private val context: Context) {
         val trimSilence: Boolean = false,
         val normalize: Boolean = true,
         val fontFamily: String = "cairo",
-        val fontScale: Float = 1f
+        val fontScale: Float = 1f,
+        val fontBold: Boolean = false
     )
 
     val settings: Flow<Settings> = context.dataStore.data.map { p ->
@@ -95,7 +97,8 @@ class SettingsRepository(private val context: Context) {
             trimSilence = p[K.trimSilence] ?: false,
             normalize = p[K.normalize] ?: true,
             fontFamily = p[K.fontFamily] ?: "cairo",
-            fontScale = p[K.fontScale] ?: 1f
+            fontScale = p[K.fontScale] ?: 1f,
+            fontBold = p[K.fontBold] ?: false
         )
     }
 
@@ -123,4 +126,5 @@ class SettingsRepository(private val context: Context) {
     suspend fun setNormalize(v: Boolean) = context.dataStore.edit { it[K.normalize] = v }
     suspend fun setFontFamily(v: String) = context.dataStore.edit { it[K.fontFamily] = v }
     suspend fun setFontScale(v: Float) = context.dataStore.edit { it[K.fontScale] = v }
+    suspend fun setFontBold(v: Boolean) = context.dataStore.edit { it[K.fontBold] = v }
 }

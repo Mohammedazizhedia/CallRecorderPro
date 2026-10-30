@@ -64,13 +64,30 @@ fun PlayerScreen(vm: PlayerViewModel, onBack: () -> Unit) {
     val context = LocalContext.current
     val recVal = rec ?: run { LaunchedEffect(Unit) { onBack() }; return }
 
-    val player = remember {
-        ExoPlayer.Builder(context).build().apply {
-            setMediaItem(MediaItem.fromUri(android.net.Uri.fromFile(File(recVal.filePath))))
-            prepare()
+    val audioFile = File(recVal.filePath)
+    var playError by remember { mutableStateOf(false) }
+    val player = remember(audioFile.absolutePath) {
+        if (!audioFile.exists()) {
+            playError = true
+            null
+        } else {
+            runCatching {
+                ExoPlayer.Builder(context).build().apply {
+                    setMediaItem(MediaItem.fromUri(android.net.Uri.fromFile(audioFile)))
+                    addListener(object : Player.Listener {
+                        override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
+                            playError = true
+                        }
+                    })
+                    prepare()
+                }
+            }.getOrElse {
+                playError = true
+                null
+            }
         }
     }
-    DisposableEffect(Unit) { onDispose { player.release() } }
+    DisposableEffect(Unit) { onDispose { player?.release() } }
 
     var peaks by remember { mutableStateOf(FloatArray(0)) }
     LaunchedEffect(recVal.filePath) {
@@ -92,8 +109,28 @@ fun PlayerScreen(vm: PlayerViewModel, onBack: () -> Unit) {
         }
     }
 
-    vm.startTicker({ player.isPlaying }, { player.currentPosition })
+    if (player != null && !playError) {
+        vm.startTicker({ player.isPlaying }, { player.currentPosition })
+    }
 
+    if (playError || player == null) {
+        Column(
+            Modifier.fillMaxSize().padding(24.dp),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = stringResource(
+                    if (audioFile.exists()) R.string.player_error else R.string.player_file_missing
+                ),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.error
+            )
+            Spacer(Modifier.height(16.dp))
+            OutlinedButton(onClick = onBack) { Text(stringResource(R.string.cancel)) }
+        }
+        return
+    }
+    val p = player
     Scaffold(topBar = {
         TopAppBar(
             title = { Text(recVal.contactName ?: recVal.number) },
@@ -111,7 +148,7 @@ fun PlayerScreen(vm: PlayerViewModel, onBack: () -> Unit) {
                     listOf(0.5f, 1.0f, 1.5f, 2.0f).forEach { v ->
                         DropdownMenuItem(
                             text = { Text("${v}x") },
-                            onClick = { player.setPlaybackSpeed(v); expanded = false }
+                            onClick = { p.setPlaybackSpeed(v); expanded = false }
                         )
                     }
                 }
@@ -128,17 +165,17 @@ fun PlayerScreen(vm: PlayerViewModel, onBack: () -> Unit) {
             WaveformView(
                 peaks = peaks,
                 progress = if (recVal.durationMs > 0) position.toFloat() / recVal.durationMs else 0f,
-                onSeek = { p -> player.seekTo((p * recVal.durationMs).toLong()) }
+                onSeek = { p -> p.seekTo((p * recVal.durationMs).toLong()) }
             )
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                IconButton(onClick = { player.seekBack() }) { Icon(Icons.Filled.Replay, null) }
-                IconButton(onClick = { if (player.isPlaying) player.pause() else player.play() }) {
+                IconButton(onClick = { p.seekBack() }) { Icon(Icons.Filled.Replay, null) }
+                IconButton(onClick = { if (p.isPlaying) p.pause() else p.play() }) {
                     Icon(
-                        if (player.isPlaying) Icons.Filled.Close else Icons.Filled.PlayArrow,
+                        if (p.isPlaying) Icons.Filled.Close else Icons.Filled.PlayArrow,
                         null
                     )
                 }
-                IconButton(onClick = { player.seekForward() }) { Icon(Icons.Filled.Forward, null) }
+                IconButton(onClick = { p.seekForward() }) { Icon(Icons.Filled.Forward, null) }
                 IconButton(onClick = { showMarkerDialog = true }) { Icon(Icons.Filled.Add, null) }
             }
             Row(
@@ -147,12 +184,12 @@ fun PlayerScreen(vm: PlayerViewModel, onBack: () -> Unit) {
             ) {
                 FilterChip(
                     selected = loopA != null,
-                    onClick = { loopA = player.currentPosition; if (loopB != null && loopB!! <= loopA!!) loopB = null },
+                    onClick = { loopA = p.currentPosition; if (loopB != null && loopB!! <= loopA!!) loopB = null },
                     label = { Text("A " + (loopA?.let(::formatDuration) ?: "--:--")) }
                 )
                 FilterChip(
                     selected = loopB != null,
-                    onClick = { loopB = player.currentPosition; loopEnabled = loopA != null && loopB!! > loopA!! },
+                    onClick = { loopB = p.currentPosition; loopEnabled = loopA != null && loopB!! > loopA!! },
                     label = { Text("B " + (loopB?.let(::formatDuration) ?: "--:--")) }
                 )
                 FilterChip(
@@ -193,7 +230,7 @@ fun PlayerScreen(vm: PlayerViewModel, onBack: () -> Unit) {
                             text = formatDuration(m.positionMs) + " — " + m.note,
                             modifier = Modifier.weight(1f)
                         )
-                        IconButton(onClick = { player.seekTo(m.positionMs) }) {
+                        IconButton(onClick = { p.seekTo(m.positionMs) }) {
                             Icon(Icons.Filled.PlayArrow, null)
                         }
                         IconButton(onClick = { vm.removeMarker(m.positionMs) }) {

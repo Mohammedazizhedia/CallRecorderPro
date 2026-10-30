@@ -112,9 +112,11 @@ class RecordingService : Service() {
                 }
             }
 
+            val preferMic = startIntent.getBooleanExtra(EXTRA_PREFER_MIC, false)
+            val effectiveSource = if (preferMic) "MIC" else s.audioSource
             val rec = CallAudioRecorder(
                 context = this@RecordingService,
-                sourceKey = s.audioSource,
+                sourceKey = effectiveSource,
                 format = s.format,
                 bitrateKbps = s.bitrateKbps,
                 useNs = s.noiseSuppressor,
@@ -152,7 +154,7 @@ class RecordingService : Service() {
                 startTime = startTimeMs,
                 durationMs = result.durationMs,
                 filePath = result.file.absolutePath,
-                source = s.audioSource,
+                source = effectiveSource,
                 format = if (s.format == AudioFormatPref.WAV) "wav" else "aac",
                 fileSize = result.file.length(),
                 sha256 = result.file.hashed()
@@ -223,16 +225,23 @@ class RecordingService : Service() {
         const val ACTION_STOP = "com.callrecorder.pro.action.STOP"
         const val EXTRA_NUMBER = "number"
         const val EXTRA_MANUAL = "manual"
+        const val EXTRA_PREFER_MIC = "prefer_mic"
 
         @Volatile
         var isRecordingNow = false
             private set
 
-        fun startRecording(context: Context, number: String?, manual: Boolean = false) {
+        fun startRecording(
+            context: Context,
+            number: String?,
+            manual: Boolean = false,
+            preferMic: Boolean = false
+        ) {
             val intent = Intent(context, RecordingService::class.java)
                 .setAction(ACTION_START)
                 .putExtra(EXTRA_NUMBER, number)
                 .putExtra(EXTRA_MANUAL, manual)
+                .putExtra(EXTRA_PREFER_MIC, preferMic)
             ContextCompat.startForegroundService(context, intent)
         }
 

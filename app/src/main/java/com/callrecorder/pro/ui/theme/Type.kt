@@ -31,15 +31,20 @@ fun fontFamilyFor(key: String): FontFamily = when (key) {
     else -> CairoFamily
 }
 
-fun appTypography(family: FontFamily): Typography = Typography(
-    displaySmall = TextStyle(fontFamily = family, fontWeight = FontWeight.Bold, fontSize = 36.sp),
-    headlineMedium = TextStyle(fontFamily = family, fontWeight = FontWeight.Bold, fontSize = 28.sp),
-    headlineSmall = TextStyle(fontFamily = family, fontWeight = FontWeight.Bold, fontSize = 24.sp),
-    titleLarge = TextStyle(fontFamily = family, fontWeight = FontWeight.Bold, fontSize = 22.sp),
-    titleMedium = TextStyle(fontFamily = family, fontWeight = FontWeight.SemiBold, fontSize = 16.sp),
-    bodyLarge = TextStyle(fontFamily = family, fontWeight = FontWeight.Normal, fontSize = 16.sp),
-    bodyMedium = TextStyle(fontFamily = family, fontWeight = FontWeight.Normal, fontSize = 14.sp),
-    labelLarge = TextStyle(fontFamily = family, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-)
+fun appTypography(family: FontFamily, bold: Boolean = false): Typography {
+    val wNormal = if (bold) FontWeight.Bold else FontWeight.Normal
+    val wSemi = if (bold) FontWeight.Bold else FontWeight.SemiBold
+    val wBold = FontWeight.Bold
+    return Typography(
+    displaySmall = TextStyle(fontFamily = family, fontWeight = wBold, fontSize = 36.sp),
+    headlineMedium = TextStyle(fontFamily = family, fontWeight = wBold, fontSize = 28.sp),
+    headlineSmall = TextStyle(fontFamily = family, fontWeight = wBold, fontSize = 24.sp),
+    titleLarge = TextStyle(fontFamily = family, fontWeight = wBold, fontSize = 22.sp),
+    titleMedium = TextStyle(fontFamily = family, fontWeight = wSemi, fontSize = 16.sp),
+    bodyLarge = TextStyle(fontFamily = family, fontWeight = wNormal, fontSize = 16.sp),
+    bodyMedium = TextStyle(fontFamily = family, fontWeight = wNormal, fontSize = 14.sp),
+    labelLarge = TextStyle(fontFamily = family, fontWeight = wSemi, fontSize = 14.sp)
+    )
+}
 
 val CairoTypography = appTypography(CairoFamily)

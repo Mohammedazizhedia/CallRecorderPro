@@ -31,6 +31,7 @@ private val DarkColors = darkColorScheme(
 fun CallRecorderTheme(
     fontKey: String = "cairo",
     fontScale: Float = 1f,
+    bold: Boolean = false,
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
@@ -50,7 +51,7 @@ fun CallRecorderTheme(
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
-            typography = appTypography(fontFamilyFor(fontKey)),
+            typography = appTypography(fontFamilyFor(fontKey), bold),
             content = content
         )
     }
