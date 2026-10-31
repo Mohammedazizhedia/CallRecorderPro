@@ -11,10 +11,12 @@ class QuickRecordTileService : TileService() {
     }
 
     override fun onClick() {
-        if (RecordingService.isRecordingNow) {
-            RecordingService.requestStop(this)
-        } else {
-            RecordingService.startRecording(this, null, manual = true)
+        runCatching {
+            if (RecordingService.isRecordingNow) {
+                RecordingService.requestStop(this)
+            } else {
+                RecordingService.startRecording(this, null, manual = true)
+            }
         }
         updateTile()
     }

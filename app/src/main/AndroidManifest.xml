@@ -64,7 +64,7 @@
         <service
             android:name=".record.QuickRecordTileService"
             android:exported="true"
-            android:label="@string/tile_record"
+            android:label="@string/app_name"
             android:icon="@drawable/ic_launcher_foreground"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>

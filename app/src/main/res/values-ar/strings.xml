@@ -149,4 +149,14 @@
     <string name="settings_debug">سجل التشخيص</string>
     <string name="settings_debug_desc">سجّل أي حاجة، وبعدين افتح السجل ده وابعت صورة منه عند الإبلاغ عن مشكلة.</string>
     <string name="settings_debug_show">عرض السجل</string>
+    <string name="settings_theme">سمة الألوان</string>
+    <string name="theme_dynamic">ألوان النظام (ديناميكية)</string>
+    <string name="theme_blue">أزرق</string>
+    <string name="theme_green">أخضر</string>
+    <string name="theme_purple">بنفسجي</string>
+    <string name="theme_amoled">أسود (AMOLED)</string>
+    <string name="settings_selected_hint">أرقام لقواعد المحدد/الاستثناء (افصل بفاصلة)</string>
+    <string name="settings_selected_save">حفظ الأرقام</string>
+    <string name="settings_normalize">توحيد مستوى الصوت (WAV)</string>
+    <string name="settings_trim">إزالة الصمت (WAV)</string>
 </resources>

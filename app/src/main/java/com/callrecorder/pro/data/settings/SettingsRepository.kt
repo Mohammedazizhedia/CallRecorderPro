@@ -41,6 +41,7 @@ class SettingsRepository(private val context: Context) {
         val normalize = booleanPreferencesKey("normalize")
         val fontFamily = stringPreferencesKey("font_family")
         val fontBold = booleanPreferencesKey("font_bold")
+        val theme = stringPreferencesKey("theme")
         val fontScale = floatPreferencesKey("font_scale")
     }
 
@@ -67,7 +68,8 @@ class SettingsRepository(private val context: Context) {
         val normalize: Boolean = true,
         val fontFamily: String = "cairo",
         val fontScale: Float = 1f,
-        val fontBold: Boolean = false
+        val fontBold: Boolean = false,
+        val theme: String = "dynamic"
     )
 
     val settings: Flow<Settings> = context.dataStore.data.map { p ->
@@ -98,7 +100,8 @@ class SettingsRepository(private val context: Context) {
             normalize = p[K.normalize] ?: true,
             fontFamily = p[K.fontFamily] ?: "cairo",
             fontScale = p[K.fontScale] ?: 1f,
-            fontBold = p[K.fontBold] ?: false
+            fontBold = p[K.fontBold] ?: false,
+            theme = p[K.theme] ?: "dynamic"
         )
     }
 
@@ -127,4 +130,5 @@ class SettingsRepository(private val context: Context) {
     suspend fun setFontFamily(v: String) = context.dataStore.edit { it[K.fontFamily] = v }
     suspend fun setFontScale(v: Float) = context.dataStore.edit { it[K.fontScale] = v }
     suspend fun setFontBold(v: Boolean) = context.dataStore.edit { it[K.fontBold] = v }
+    suspend fun setTheme(v: String) = context.dataStore.edit { it[K.theme] = v }
 }

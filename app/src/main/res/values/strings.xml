@@ -156,4 +156,14 @@
     <string name="settings_debug">Diagnostic log</string>
     <string name="settings_debug_desc">Record something, then open this log and send a screenshot when reporting a problem.</string>
     <string name="settings_debug_show">Show log</string>
+    <string name="settings_theme">Theme</string>
+    <string name="theme_dynamic">System (dynamic colors)</string>
+    <string name="theme_blue">Blue</string>
+    <string name="theme_green">Green</string>
+    <string name="theme_purple">Purple</string>
+    <string name="theme_amoled">Black (AMOLED)</string>
+    <string name="settings_selected_hint">Numbers for selected/except rules (comma separated)</string>
+    <string name="settings_selected_save">Save numbers</string>
+    <string name="settings_normalize">Normalize loudness (WAV)</string>
+    <string name="settings_trim">Trim silence (WAV)</string>
 </resources>

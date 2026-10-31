@@ -20,11 +20,15 @@ class CallStateReceiver : BroadcastReceiver() {
         val number = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER)
 
         when (state) {
-            TelephonyManager.EXTRA_STATE_OFFHOOK -> {
+            TelephonyManager.EXTRA_STATE_OFFHOOK -> runCatching {
                 RecordingService.startRecording(context, number)
+            }.onFailure {
+                Log.w("CallStateReceiver", "start blocked: ${it.message}")
             }
-            TelephonyManager.EXTRA_STATE_IDLE -> {
+            TelephonyManager.EXTRA_STATE_IDLE -> runCatching {
                 RecordingService.requestStop(context)
+            }.onFailure {
+                Log.w("CallStateReceiver", "stop failed: ${it.message}")
             }
             TelephonyManager.EXTRA_STATE_RINGING -> Unit
         }

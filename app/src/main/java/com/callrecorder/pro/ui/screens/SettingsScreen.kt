@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -151,6 +152,27 @@ fun SettingsScreen(container: AppContainer, onOpenSourceTest: () -> Unit) {
                 }
             }
 
+            if (settings.rule == com.callrecorder.pro.data.settings.RecordingRule.SELECTED_ONLY ||
+                settings.rule == com.callrecorder.pro.data.settings.RecordingRule.ALL_EXCEPT
+            ) {
+                var selectedText by remember(settings.selectedNumbers) {
+                    mutableStateOf(settings.selectedNumbers.joinToString(", "))
+                }
+                OutlinedTextField(
+                    value = selectedText,
+                    onValueChange = { selectedText = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text(stringResource(R.string.settings_selected_hint)) }
+                )
+                OutlinedButton(onClick = {
+                    upd {
+                        container.settings.setSelectedNumbers(
+                            selectedText.split(',', ' ').map { it.trim() }.filter { it.isNotBlank() }.toSet()
+                        )
+                    }
+                }) { Text(stringResource(R.string.settings_selected_save)) }
+            }
+
             SectionTitle(stringResource(R.string.settings_accessibility))
             Text(stringResource(R.string.settings_accessibility_desc))
             OutlinedButton(onClick = {
@@ -251,6 +273,22 @@ fun SettingsScreen(container: AppContainer, onOpenSourceTest: () -> Unit) {
                             Text("OK")
                         }
                     })
+            }
+
+            SectionTitle(stringResource(R.string.settings_theme))
+            listOf(
+                "dynamic" to R.string.theme_dynamic,
+                "blue" to R.string.theme_blue,
+                "green" to R.string.theme_green,
+                "purple" to R.string.theme_purple,
+                "amoled" to R.string.theme_amoled
+            ).forEach { (key, label) ->
+                Row {
+                    RadioButton(
+                        selected = settings.theme == key,
+                        onClick = { upd { container.settings.setTheme(key) } })
+                    Text(stringResource(label))
+                }
             }
 
             SectionTitle(stringResource(R.string.settings_font))
