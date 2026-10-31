@@ -51,6 +51,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import com.callrecorder.pro.R
 import com.callrecorder.pro.ui.PlayerViewModel
 import com.callrecorder.pro.ui.WaveformView
+import com.callrecorder.pro.util.DebugLog
 import com.callrecorder.pro.util.decodePeaks
 import com.callrecorder.pro.util.formatDuration
 import kotlinx.coroutines.Dispatchers
@@ -68,6 +69,7 @@ fun PlayerScreen(vm: PlayerViewModel, onBack: () -> Unit) {
 
     val audioFile = File(recVal.filePath)
     var playError by remember { mutableStateOf(false) }
+    DebugLog.log("player open: exists=${audioFile.exists()} size=${if (audioFile.exists()) audioFile.length() else 0} path=${recVal.filePath}")
     val player = remember(audioFile.absolutePath) {
         if (!audioFile.exists()) {
             playError = true
@@ -78,6 +80,7 @@ fun PlayerScreen(vm: PlayerViewModel, onBack: () -> Unit) {
                     setMediaItem(MediaItem.fromUri(android.net.Uri.fromFile(audioFile)))
                     addListener(object : Player.Listener {
                         override fun onPlayerError(error: androidx.media3.common.PlaybackException) {
+                            DebugLog.log("PLAYER ERROR: ${error.errorCodeName}")
                             playError = true
                         }
                     })

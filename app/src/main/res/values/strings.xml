@@ -153,4 +153,7 @@
     <string name="font_bold">Bold text</string>
     <string name="player_file_missing">Recording file is missing</string>
     <string name="player_error">Could not play this recording (file may be corrupt)</string>
+    <string name="settings_debug">Diagnostic log</string>
+    <string name="settings_debug_desc">Record something, then open this log and send a screenshot when reporting a problem.</string>
+    <string name="settings_debug_show">Show log</string>
 </resources>

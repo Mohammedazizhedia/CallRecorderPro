@@ -13,8 +13,8 @@ android {
         applicationId = "com.callrecorder.pro"
         minSdk = 29
         targetSdk = 35
-        versionCode = 14
-        versionName = "1.0-v14"
+        versionCode = 15
+        versionName = "1.0-v15"
         ndk { abiFilters += listOf("arm64-v8a") }
         resourceConfigurations += listOf("ar", "en")
     }

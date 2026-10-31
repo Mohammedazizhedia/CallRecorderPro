@@ -146,4 +146,7 @@
     <string name="font_bold">خط عريض (Bold)</string>
     <string name="player_file_missing">ملف التسجيل غير موجود</string>
     <string name="player_error">تعذر تشغيل هذا التسجيل (الملف قد يكون تالفاً)</string>
+    <string name="settings_debug">سجل التشخيص</string>
+    <string name="settings_debug_desc">سجّل أي حاجة، وبعدين افتح السجل ده وابعت صورة منه عند الإبلاغ عن مشكلة.</string>
+    <string name="settings_debug_show">عرض السجل</string>
 </resources>

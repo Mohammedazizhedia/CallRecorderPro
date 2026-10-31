@@ -227,6 +227,32 @@ fun SettingsScreen(container: AppContainer, onOpenSourceTest: () -> Unit) {
                 }
             }) { Text(stringResource(R.string.settings_battery_desc)) }
 
+            SectionTitle(stringResource(R.string.settings_debug))
+            Text(stringResource(R.string.settings_debug_desc))
+            var showLog by remember { mutableStateOf(false) }
+            OutlinedButton(onClick = { showLog = true }) {
+                Text(stringResource(R.string.settings_debug_show))
+            }
+            if (showLog) {
+                val logLines by com.callrecorder.pro.util.DebugLog.lines.collectAsState()
+                androidx.compose.material3.AlertDialog(
+                    onDismissRequest = { showLog = false },
+                    title = { Text(stringResource(R.string.settings_debug)) },
+                    text = {
+                        androidx.compose.foundation.lazy.LazyColumn(
+                            modifier = Modifier.fillMaxWidth(),
+                            reverseLayout = true
+                        ) {
+                            items(logLines.asReversed()) { Text(it, style = MaterialTheme.typography.bodySmall) }
+                        }
+                    },
+                    confirmButton = {
+                        androidx.compose.material3.TextButton(onClick = { showLog = false }) {
+                            Text("OK")
+                        }
+                    })
+            }
+
             SectionTitle(stringResource(R.string.settings_font))
             Text(stringResource(R.string.settings_font_family), style = MaterialTheme.typography.titleMedium)
             listOf(

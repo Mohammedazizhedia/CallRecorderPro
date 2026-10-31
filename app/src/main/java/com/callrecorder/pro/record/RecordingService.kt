@@ -22,6 +22,7 @@ import com.callrecorder.pro.data.settings.RecordingRule
 import com.callrecorder.pro.process.PostProcessWorker
 import com.callrecorder.pro.util.hashed
 import com.callrecorder.pro.record.RecordingStateBus
+import com.callrecorder.pro.util.DebugLog
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -54,6 +55,7 @@ class RecordingService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        DebugLog.log("onStartCommand action=${intent?.action} manual=${intent?.getBooleanExtra(EXTRA_MANUAL, false)}")
         when (intent?.action) {
             ACTION_STOP -> { stopRecording(); stopSelf() }
             else -> intent?.let { startRecordingInternal(it) }
@@ -69,6 +71,7 @@ class RecordingService : Service() {
         scope.launch {
             val s = settings.settings.first()
             val manual = startIntent.getBooleanExtra(EXTRA_MANUAL, false)
+            DebugLog.log("settings loaded: rule=${s.rule} source=${s.audioSource} format=${s.format}")
 
             // --- rules engine (manual tile start bypasses rules) ---
             val incomingNumber = startIntent.getStringExtra(EXTRA_NUMBER)
@@ -84,12 +87,14 @@ class RecordingService : Service() {
                 RecordingRule.ALL_EXCEPT ->
                     s.selectedNumbers.none { resolvedNumber.endsWith(it.takeLast(9)) }
             })
-            if (!allowed) { stopSelf(); return@launch }
+            if (!allowed) { DebugLog.log("BLOCKED by rules/ignore list"); stopSelf(); return@launch }
+            DebugLog.log("rule check passed")
 
             val recordPermission = ContextCompat.checkSelfPermission(
                 this@RecordingService, android.Manifest.permission.RECORD_AUDIO
             ) == PackageManager.PERMISSION_GRANTED
-            if (!recordPermission) { stopSelf(); return@launch }
+            if (!recordPermission) { DebugLog.log("BLOCKED: RECORD_AUDIO not granted"); stopSelf(); return@launch }
+            DebugLog.log("mic permission OK")
 
             startTimeMs = System.currentTimeMillis()
             number = incomingNumber
@@ -98,6 +103,7 @@ class RecordingService : Service() {
             outputFile = File(dir, "call_$stamp.${if (s.format == AudioFormatPref.WAV) "wav" else "m4a"}")
 
             goForeground()
+            DebugLog.log("foreground started, output=$outputFile")
             recording = true
             isRecordingNow = true
             RecordingStateBus.onStart()
@@ -125,7 +131,12 @@ class RecordingService : Service() {
             )
             recorder = rec
 
-            val result = runCatching { rec.recordTo(outputFile) }.getOrNull()
+            DebugLog.log("recording loop starting (source=$effectiveSource)")
+            val resultOrErr = runCatching { rec.recordTo(outputFile) }
+            resultOrErr.exceptionOrNull()?.let {
+                DebugLog.log("RECORDER ERROR: ${it.javaClass.simpleName}: ${it.message}")
+            }
+            val result = resultOrErr.getOrNull()
             recording = false
             isRecordingNow = false
             RecordingStateBus.onStop()
@@ -135,10 +146,12 @@ class RecordingService : Service() {
             // competitor feature (ACR): skip junk recordings below min duration
             val minMs = s.minDurationSec * 1000L
             if (result == null || result.durationMs < maxOf(1000L, minMs) || result.file.length() < 1024) {
+                DebugLog.log("DISCARDED: null=${result == null} dur=${result?.durationMs} size=${result?.file?.length()}")
                 result?.file?.delete()
                 stopSelf()
                 return@launch
             }
+            DebugLog.log("SAVED: dur=${result.durationMs}ms size=${result.file.length()}B rms=${"%.1f".format(result.rms)} peak=${result.peak}")
             isRecordingNow = false
 
             val callInfo = CallLogResolver.resolve(
