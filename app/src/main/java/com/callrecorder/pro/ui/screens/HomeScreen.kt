@@ -73,6 +73,9 @@ fun HomeScreen(
     val totalSize by vm.totalSize.collectAsState()
     val isRecording by RecordingStateBus.isRecording.collectAsState()
     val startedAt by RecordingStateBus.startedAt.collectAsState()
+    val manualRecording by vm.manualRecording.collectAsState()
+    val manualElapsed by vm.manualElapsed.collectAsState()
+    val manualError by vm.manualError.collectAsState()
     var pendingDelete by remember { mutableStateOf<RecordingEntity?>(null) }
     val context = LocalContext.current
 
@@ -104,18 +107,49 @@ fun HomeScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    if (isRecording) RecordingService.requestStop(context)
-                    else RecordingService.startRecording(context, null, manual = true)
+                    if (vm.manualRecording.value) vm.stopManualRecording()
+                    else vm.startManualRecording(context)
                 }
             ) {
                 Icon(
-                    imageVector = if (isRecording) Icons.Filled.Stop else Icons.Filled.Mic,
+                    imageVector = if (manualRecording) Icons.Filled.Stop else Icons.Filled.Mic,
                     contentDescription = null
                 )
             }
         }
     ) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
+            manualError?.let { err ->
+                Card(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
+                ) {
+                    Text(
+                        text = err,
+                        modifier = Modifier.padding(12.dp),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                }
+            }
+            if (manualRecording) {
+                Card(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                ) {
+                    Row(
+                        Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        LinearProgressIndicator(Modifier.width(24.dp))
+                        Spacer(Modifier.width(12.dp))
+                        Text(
+                            text = "تسجيل يدوي · " + formatDuration(manualElapsed),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
+                }
+            }
             if (isRecording) {
                 Card(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),

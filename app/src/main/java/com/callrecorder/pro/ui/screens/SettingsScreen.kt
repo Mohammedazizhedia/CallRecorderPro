@@ -249,6 +249,28 @@ fun SettingsScreen(container: AppContainer, onOpenSourceTest: () -> Unit) {
                 }
             }) { Text(stringResource(R.string.settings_battery_desc)) }
 
+            SectionTitle(stringResource(R.string.settings_about))
+            var showAbout by remember { mutableStateOf(false) }
+            OutlinedButton(onClick = { showAbout = true }) {
+                Text(stringResource(R.string.settings_about))
+            }
+            if (showAbout) {
+                val ver = runCatching {
+                    context.packageManager.getPackageInfo(context.packageName, 0).versionName
+                }.getOrDefault("?")
+                androidx.compose.material3.AlertDialog(
+                    onDismissRequest = { showAbout = false },
+                    title = { Text(stringResource(R.string.app_name)) },
+                    text = {
+                        Text("v$ver\n\n" + stringResource(R.string.about_branding))
+                    },
+                    confirmButton = {
+                        androidx.compose.material3.TextButton(onClick = { showAbout = false }) {
+                            Text("OK")
+                        }
+                    })
+            }
+
             SectionTitle(stringResource(R.string.settings_debug))
             Text(stringResource(R.string.settings_debug_desc))
             var showLog by remember { mutableStateOf(false) }

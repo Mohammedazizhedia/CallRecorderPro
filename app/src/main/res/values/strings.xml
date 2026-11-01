@@ -166,4 +166,6 @@
     <string name="settings_selected_save">Save numbers</string>
     <string name="settings_normalize">Normalize loudness (WAV)</string>
     <string name="settings_trim">Trim silence (WAV)</string>
+    <string name="settings_about">About</string>
+    <string name="about_branding">Built with BFB.AI — Built For Benefits, by AI</string>
 </resources>

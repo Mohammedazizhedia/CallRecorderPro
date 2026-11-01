@@ -1,0 +1,7 @@
+BFB.AI — Built For Benefits, by AI
+==================================
+Project : Call Recorder Pro
+Version : 1.0-v18
+Build   : #018
+Brand   : assets/brand/bfb_logo_{light,dark,mono}.svg
+Rule §16: branding appears in About / README / code headers / BFB.txt — never in the app icon.

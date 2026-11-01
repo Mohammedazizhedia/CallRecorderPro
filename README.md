@@ -1,3 +1,5 @@
+<!-- BFB.AI — Built For Benefits, by AI -->
+
 # Call Recorder Pro
 
 Bilingual (Arabic/English, full RTL) call recorder for Android — native Kotlin +
@@ -87,3 +89,17 @@ debug-signed build so CI never fails on forks.
 Call-recording laws differ by jurisdiction. The app shows a legal disclaimer on
 first run and can play a consent beep at recording start. **You** are
 responsible for complying with local laws.
+
+## Changelog
+- v1.0-v18: Crash trap (§10) · BFB branding + About (§16) · DESIGN.md (§2) · in-app manual recorder with instant error display
+- v1.0-v16: themes · real Bold (IBM Plex) · selected-numbers UI · tile label fix · receiver/tile crash-guards
+- v1.0-v15: diagnostic log
+- v1.0-v10: AccessibilityService auto-record · Quick Settings tile
+- v1.0-v7..v9: manual FAB · APK naming · icon fix
+- v1.0-v5: compile fixes · debug signing fallback
+- v1.0-v1: initial
+
+## Security & Privacy
+- All data stays on-device (internal storage). No analytics, no network calls.
+- Backup ZIP is created only by explicit user action.
+- Source: auditable at this repository.

@@ -159,4 +159,6 @@
     <string name="settings_selected_save">حفظ الأرقام</string>
     <string name="settings_normalize">توحيد مستوى الصوت (WAV)</string>
     <string name="settings_trim">إزالة الصمت (WAV)</string>
+    <string name="settings_about">عن التطبيق</string>
+    <string name="about_branding">مبني بـ BFB.AI — Built For Benefits, by AI</string>
 </resources>

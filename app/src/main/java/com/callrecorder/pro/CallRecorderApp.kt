@@ -17,6 +17,7 @@ class CallRecorderApp : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
         container = AppContainer(this)
+        Thread.setDefaultUncaughtExceptionHandler(com.callrecorder.pro.util.CrashHandler(this))
 
         val nm = getSystemService(NotificationManager::class.java)
         nm.createNotificationChannel(
